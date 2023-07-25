@@ -20,7 +20,7 @@ public class task1 {
             getNum();
         }
         else {
-            System.out.println("Вы ввели не дробное число. Попробуйте снова.");
+            System.out.println("Вы ввели не дробное число. Попробуйте снова.\n");
             getNum();
         }
     }
