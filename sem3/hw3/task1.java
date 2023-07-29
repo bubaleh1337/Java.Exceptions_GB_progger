@@ -1,5 +1,9 @@
 package sem3.hw3;
 
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
@@ -23,7 +27,7 @@ import java.util.regex.Matcher;
 Приложение должно попытаться распарсить полученные значения и выделить из них требуемые параметры.
 Если форматы данных не совпадают, нужно бросить исключение, соответствующее типу проблемы.
 Можно использовать встроенные типы java и создать свои. Исключение должно быть корректно
-обработано, пользователю выведено сообщение с информацией, что именно неверно.
+обработано, пользователю выведено сообщение с информацией, что именно неверно. +
 
 Если всё введено и обработано верно, должен создаться файл с названием, равным фамилии,
 в него в одну строку должны записаться полученные данные, вида
@@ -59,7 +63,17 @@ public class task1 {
         try {
             human_info = prompt("Введите через пробел: ФИО, дату рождения, номер телефона и пол (f или m): ");
             checkAmount(human_info);
+            for (int i = 0; i < human_info.length; i++) {
+                checkFormat(human_info, i);
+            }
             printPB(human_info);
+
+            Map<Integer, String> sent = new HashMap<>();
+            sent = parse(human_info);
+            //вывод значений
+            for (String value : sent.values()) {
+                System.out.print(value + " ");
+            }
         } catch (RuntimeException e) {
             System.out.println();
         }
@@ -69,6 +83,57 @@ public class task1 {
         System.out.println(msg);
         return scanner.nextLine().split(" ");
     }
+    // Парсинг полученных значений:
+    public static Map<Integer, String> parse(String[] human_info) {
+        Map<Integer, String> human = new HashMap<>();
+        int i = 0;
+        for (String word : human_info) {
+            human.put(i++, word);
+        }
+        return human;
+    }
+
+    // Проверка формата введённых данных:
+    public static void checkFormat(String[] human_info, int i) {
+        switch (i) {
+            case 0: // Проверка фамилии
+                if(checkString(human_info[0]))
+                    throw new StringException(-1);
+            case 1: // Проверка имени
+                if(checkString(human_info[1]))
+                    throw new StringException(-1);
+            case 2: // Проверка отчества
+                if(checkString(human_info[2]))
+                    throw new StringException(-1);
+            case 3: // Проверка даты
+                if (!dateValidator(human_info[3])) throw new StringException(-3);
+            case 4: // Проверка номера телефона
+                if(!checkString(human_info[4]))
+                    throw new StringException(-2);
+            case 5: // Проверка пола
+                if (!human_info[5].equals("f") && !human_info[5].equals("m")) throw new StringException(-4);
+        }
+    }
+    public static boolean checkString(String line) {
+        try {
+            Integer.valueOf(line);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+//    public static void checkFormat(Map<String, String> people) {
+//        try {
+//            Integer.valueOf(people.get(0));
+//        } catch (StringException e) {
+//
+//        }
+//        for (Map.Entry<String, String> item : people.entrySet()) {
+//
+//            System.out.printf("\nKey: %s  Value: %s \n", item.getKey(), item.getValue());
+//        }
+//    }
+
     // Проверка на количество введённых данных:
     public static void checkAmount(String[] human_info) {
         if (human_info.length < 6) throw new AmountException(-1);
@@ -87,13 +152,20 @@ public class task1 {
 
     // Проверка валидности даты:
     public static boolean dateValidator(String date) {
-        Matcher matcher = Date_PATTERN.matcher(date);
-        return matcher.matches();
+        SimpleDateFormat myFormat = new SimpleDateFormat("dd.MM.yyyy");
+        myFormat.setLenient(false);
+        try {
+            myFormat.parse(date);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
     public static void printPB(String[] human) {
         for (String s : human) {
             System.out.print(s + " ");
         }
+        System.out.println();
     }
 }
 class AmountException extends RuntimeException {
@@ -103,6 +175,21 @@ class AmountException extends RuntimeException {
             case -1 -> System.out.println("Вы ввели меньше данных, чем нужно.");
             case -3 -> System.out.println("Вы ввели больше данных, чем нужно.");
         }
+    }
+}
+class StringException extends NumberFormatException {
+    public StringException(int error) {
+        super();
+        switch (error) {
+            case -1 ->
+                    System.out.println("Неккоректен формат ввода введённых данных. В ФИО должны быть только буквенные значения.");
+            case -2 ->
+                    System.out.println("Неккоректен формат ввода введённых данных. При вводе номера телефона должны быть только числовые значения.");
+            case -3 ->
+                    System.out.println("Неккоректен формат ввода введённых данных. Дата должна быть в формате: dd.mm.yyyy");
+            case -4 ->
+                    System.out.println("Неккоректен формат ввода введённых данных. Здесь нужно вводить либо f, либо m.");
 
+        }
     }
 }
