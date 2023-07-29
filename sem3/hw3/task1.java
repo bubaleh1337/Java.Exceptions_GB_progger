@@ -48,25 +48,28 @@ public class task1 {
 
     public static void main(String[] args) throws FileNotExist {
         String[] human_info = new String[]{};
-        File file = new File("D:\\Kate\\EDU\\GeekBrains\\lessons\\practice\\Java.Exceptions_GB_progger\\sem3\\hw3\\phonebook");
-        try {
-            Map<Integer, String> sent = readFile(file);
-            human_info = prompt("Введите через пробел: ФИО, дату рождения, номер телефона и пол (f или m): ");
-            checkAmount(human_info);
-            for (int i = 0; i < human_info.length; i++) {
-                checkFormat(human_info, i);
-            }
-            printPB(human_info);
-            //Map<Integer, String> sent = new HashMap<>();
-            sent = parse(human_info);
-            writeFile(sent, human_info, file);
+        File file = new File("D:\\Kate\\EDU\\GeekBrains\\lessons\\practice\\Java.Exceptions_GB_progger\\phonebook");
+        while (true) {
+            try {
+                Map<Integer, String> sent = readFile(file);
+                human_info = prompt("Введите через пробел: ФИО, дату рождения, номер телефона и пол (f или m): ");
+                if (human_info.equals("")) break;
+                checkAmount(human_info);
+                for (int i = 0; i < human_info.length; i++) {
+                    checkFormat(human_info, i);
+                }
+                // printPB(human_info);
+                //Map<Integer, String> sent = new HashMap<>();
+                sent = parse(human_info);
+                writeFile(sent, human_info, file);
 
-            //вывод значений
-            for (String value : sent.values()) {
-                System.out.print(value + " ");
+                //вывод значений
+//                for (String value : sent.values()) {
+//                    System.out.print(value + " ");
+//                }
+            } catch (RuntimeException e) {
+                System.out.println();
             }
-        } catch (RuntimeException e) {
-            System.out.println();
         }
     }
 
@@ -174,7 +177,8 @@ public class task1 {
             String line;
             int i = 0;
             while ((line = br.readLine()) != null) {
-                list.put(i++, line);
+                list.put(i, line);
+                i++;
             }
         } catch (FileNotFoundException e) {
             System.out.println(e.getMessage());
@@ -189,10 +193,13 @@ public class task1 {
         try {
             BufferedWriter bw = new BufferedWriter(new FileWriter(file));
             int i = 0;
-            for (String word : human) {
-                bw.write("<" + lst.put(i++, word) + ">");
+            for (String item : human) {
+                bw.write("<" + lst.put(i++, item) + ">");
+
             }
+            bw.write("\n");
             bw.newLine();
+
             bw.close();
         } catch (
                 IOException e) {
@@ -227,10 +234,12 @@ class StringException extends NumberFormatException {
         }
     }
 }
+
 class FileNotExist extends FileNotFoundException {
     public FileNotExist(String path) {
         super("Такого файла не существует: " + path);
     }
+
     public FileNotExist() {
         super("Такого файла не существует.");
     }
