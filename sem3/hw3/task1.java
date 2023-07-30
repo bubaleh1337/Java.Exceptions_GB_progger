@@ -3,7 +3,6 @@ package sem3.hw3;
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.regex.Pattern;
 
 /*
 1. Напишите приложение, которое будет запрашивать у пользователя следующие данные в произвольном
@@ -47,26 +46,18 @@ public class task1 {
     static Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) throws FileNotExist {
-        String[] human_info = new String[]{};
-        File file = new File("D:\\Kate\\EDU\\GeekBrains\\lessons\\practice\\Java.Exceptions_GB_progger\\phonebook");
+        String[] human_info;
+        File file = new File("D:\\Kate\\EDU\\GeekBrains\\lessons\\practice\\Java.Exceptions_GB_progger\\phonebook.txt");
+        readFile(file);
         while (true) {
             try {
-                Map<Integer, String> sent = readFile(file);
+
                 human_info = prompt("Введите через пробел: ФИО, дату рождения, номер телефона и пол (f или m): ");
-                if (human_info.equals("")) break;
                 checkAmount(human_info);
                 for (int i = 0; i < human_info.length; i++) {
                     checkFormat(human_info, i);
                 }
-                // printPB(human_info);
-                //Map<Integer, String> sent = new HashMap<>();
-                sent = parse(human_info);
-                writeFile(sent, human_info, file);
-
-                //вывод значений
-//                for (String value : sent.values()) {
-//                    System.out.print(value + " ");
-//                }
+                writeFile(human_info, file);
             } catch (RuntimeException e) {
                 System.out.println();
             }
@@ -120,33 +111,12 @@ public class task1 {
             return false;
         }
     }
-//    public static void checkFormat(Map<String, String> people) {
-//        try {
-//            Integer.valueOf(people.get(0));
-//        } catch (StringException e) {
-//
-//        }
-//        for (Map.Entry<String, String> item : people.entrySet()) {
-//
-//            System.out.printf("\nKey: %s  Value: %s \n", item.getKey(), item.getValue());
-//        }
-//    }
 
     // Проверка на количество введённых данных:
     public static void checkAmount(String[] human_info) {
         if (human_info.length < 6) throw new AmountException(-1);
         if (human_info.length > 6) throw new AmountException(-3);
     }
-    // Записываем в массив:
-//    public static String[] getArray(String[] human_info) {
-//        String[] list = new String[]{};
-//        if (dateValidator(date)) {
-//            list[1] = date;
-//        } else {
-//            System.out.println(date + " - не верный формат даты. Попробуйте снова.");
-//        }
-//        return list;
-//    }
 
     // Проверка валидности даты:
     public static boolean dateValidator(String date) {
@@ -169,38 +139,31 @@ public class task1 {
     }
 
     // Чтение файла:
-    public static Map<Integer, String> readFile(File file) {
-        Map<Integer, String> list = new HashMap<>();
+    public static String readFile(File file) {
         try {
-            FileReader reader = new FileReader(file);
-            BufferedReader br = new BufferedReader(reader);
+            BufferedReader br = new BufferedReader(new FileReader(file));
             String line;
-            int i = 0;
-            while ((line = br.readLine()) != null) {
-                list.put(i, line);
-                i++;
+            while (true) {
+                line = br.readLine();
+                if (line.equals("")) break;
+                return line;
             }
         } catch (FileNotFoundException e) {
             System.out.println(e.getMessage());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return list;
+        return null;
     }
 
     // Запись в файл:
-    public static void writeFile(Map<Integer, String> lst, String[] human, File file) {
-        try {
-            BufferedWriter bw = new BufferedWriter(new FileWriter(file));
-            int i = 0;
-            for (String item : human) {
-                bw.write("<" + lst.put(i++, item) + ">");
-
+    public static void writeFile(String[] human, File file) {
+        try (FileWriter fileWriter = new FileWriter(file, true)) {
+            for (String s : human) {
+                fileWriter.write("<" + s + ">");
             }
-            bw.write("\n");
-            bw.newLine();
-
-            bw.close();
+            fileWriter.append('\n');
+            fileWriter.flush();
         } catch (
                 IOException e) {
             throw new RuntimeException(e);
