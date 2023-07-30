@@ -48,16 +48,16 @@ public class task1 {
     public static void main(String[] args) throws FileNotExist {
         String[] human_info;
         File file = new File("D:\\Kate\\EDU\\GeekBrains\\lessons\\practice\\Java.Exceptions_GB_progger\\phonebook.txt");
-        readFile(file);
+        //readFile(file);
         while (true) {
             try {
-
                 human_info = prompt("Введите через пробел: ФИО, дату рождения, номер телефона и пол (f или m): ");
                 checkAmount(human_info);
                 for (int i = 0; i < human_info.length; i++) {
                     checkFormat(human_info, i);
                 }
-                writeFile(human_info, file);
+                ArrayList<String> people = new ArrayList<>(Arrays.asList(human_info));
+                writeFile(people, file);
             } catch (RuntimeException e) {
                 System.out.println();
             }
@@ -68,16 +68,6 @@ public class task1 {
     public static String[] prompt(String msg) {
         System.out.println(msg);
         return scanner.nextLine().split(" ");
-    }
-
-    // Парсинг полученных значений:
-    public static Map<Integer, String> parse(String[] human_info) {
-        Map<Integer, String> human = new HashMap<>();
-        int i = 0;
-        for (String word : human_info) {
-            human.put(i++, word);
-        }
-        return human;
     }
 
     // Проверка формата введённых данных:
@@ -138,28 +128,10 @@ public class task1 {
         System.out.println();
     }
 
-    // Чтение файла:
-    public static String readFile(File file) {
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(file));
-            String line;
-            while (true) {
-                line = br.readLine();
-                if (line.equals("")) break;
-                return line;
-            }
-        } catch (FileNotFoundException e) {
-            System.out.println(e.getMessage());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        return null;
-    }
-
     // Запись в файл:
-    public static void writeFile(String[] human, File file) {
+    public static void writeFile(ArrayList<String> people, File file) {
         try (FileWriter fileWriter = new FileWriter(file, true)) {
-            for (String s : human) {
+            for (String s : people) {
                 fileWriter.write("<" + s + ">");
             }
             fileWriter.append('\n');
